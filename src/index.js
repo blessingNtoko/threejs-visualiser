@@ -46,6 +46,34 @@ const initVisualiser = () => {
             alpha: true,
             antialias: true
         });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const planeGeometry = new THREE.planeGeometry(800, 800, 20, 20);
+        const planeMaterial = new THREE.MeshLambertMaterial({
+            color: 0x6904CE,
+            side: THREE.DoubleSide,
+            wireframe: true
+        });
+
+        const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -.5 * Math.PI;
+        plane.position.set(0, 30, 0);
+        group.add(plane);
+
+        const plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -.5 * Math.PI;
+        plane.position.set(0, -30, 0);
+        group.add(plane2);
+
+        const icosahedronGeometry = new THREE.IcosahedronGeometry(10, 4);
+        const lambertMaterial = new THREE.MeshLambertMaterial({
+            color: 0xFF00EE,
+            wireframe: true
+        });
+
+        const ball = new THREE.Mesh(icosahedronGeometry, lambertMaterial);
+        ball.position.set(0, 0, 0);
+        group.add(ball);
     }
 
 }
