@@ -3,7 +3,7 @@ const noise = new SimplexNoise();
 
 // main function
 const initVisualiser = () => {
-    const file = document.getElementById('file');
+    const file = document.getElementById('theFile');
     const audio = document.getElementById('audio');
     const fileLabel = document.querySelector('label.file');
 
@@ -16,7 +16,7 @@ const initVisualiser = () => {
     file.onchange = () => {
         fileLabel.classList.add('normal');
         audio.classList.add('active');
-        const files = this.files;
+        const files = file.files;
 
         audio.src = URL.createObjectURL(files[0]);
         audio.load();
@@ -48,7 +48,7 @@ const initVisualiser = () => {
         });
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-        const planeGeometry = new THREE.planeGeometry(800, 800, 20, 20);
+        const planeGeometry = new THREE.PlaneGeometry(800, 800, 20, 20);
         const planeMaterial = new THREE.MeshLambertMaterial({
             color: 0x6904CE,
             side: THREE.DoubleSide,
@@ -61,8 +61,8 @@ const initVisualiser = () => {
         group.add(plane);
 
         const plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
-        plane.rotation.x = -.5 * Math.PI;
-        plane.position.set(0, -30, 0);
+        plane2.rotation.x = -.5 * Math.PI;
+        plane2.position.set(0, -30, 0);
         group.add(plane2);
 
         const icosahedronGeometry = new THREE.IcosahedronGeometry(10, 4);
@@ -94,7 +94,7 @@ const initVisualiser = () => {
 
         window.addEventListener('resize', onWindowResize, false);
 
-        renderer();
+        render();
 
         function render() {
             analyser.getByteFrequencyData(dataArray);
@@ -136,10 +136,23 @@ const initVisualiser = () => {
                 const time = window.performance.now();
                 vertex.normalize();
                 const rf = .00001;
-                const distance = (offset + baseFr) + noise.noise3D(vertex.x + time * rf * 7, vertex.y + time * rf * 8, vertex.z + time * rf * 9) * amp * treFr;
+                const distance = (offset + bassFr) + noise.noise3D(vertex.x + time * rf * 7, vertex.y + time * rf * 8, vertex.z + time * rf * 9) * amp * treFr;
                 vertex.multiplyScalar(distance);
             });
 
+            mesh.geometry.verticesNeedUpdate = true;
+            mesh.geometry.normalsNeedUpdate = true;
+            mesh.geometry.computeVertexNormals();
+            mesh.geometry.computeFaceNormals();
+        }
+
+        function makeRoughGround(mesh, distortionFr) {
+            mesh.geometry.vertices.forEach((vertex, i) => {
+                const amp = 2;
+                const time = Date.now();
+                const distance = (noise.noise2D(vertex.x + time * .0003, vertex.y + time * .0001) + 0) * distortionFr * amp;
+                vertex.z = distance;
+            });
             mesh.geometry.verticesNeedUpdate = true;
             mesh.geometry.normalsNeedUpdate = true;
             mesh.geometry.computeVertexNormals();
