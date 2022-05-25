@@ -74,6 +74,57 @@ const initVisualiser = () => {
         const ball = new THREE.Mesh(icosahedronGeometry, lambertMaterial);
         ball.position.set(0, 0, 0);
         group.add(ball);
+
+        const ambientLight = new THREE.AmbientLight(0xAAAAAA);
+        scene.add(ambientLight);
+
+        const spotLight = new THREE.SpotLight(0xFFFFFF);
+        spotLight.intensity = .9;
+        spotLight.position.set(-10, 40, 20);
+        spotLight.lookAt(ball);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        // const orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+        // orbitControls.autoRotate = true;
+
+        scene.add(group);
+
+        document.getElementById('out').appendChild(renderer.domElement);
+
+        window.addEventListener('resize', onWindowResize, false);
+
+        renderer();
+
+        function render() {
+            analyser.getByteFrequencyData(dataArray);
+
+            const lowerHalfArray = dataArray.slice(0, (dataArray.length / 2) -1);
+            const upperHalfArray = dataArray.slice((dataArray.length / 2) -1, dataArray.length - 1);
+
+            const overAllAvg = avg(dataArray);
+        }
     }
 
+}
+
+// Little Helpers
+
+function fractionate(val, minVal, maxVal) {
+    return (val - minVal) / (maxVal - minVal);
+}
+
+function modulate(val, minVal, maxVal, outMin, outMax) {
+    const fr = fractionate(val, minVal, maxVal);
+    const delta = outMax - outMin;
+    return outMin + (fr * delta);
+}
+
+function avg(arr) {
+    const total = arr.reduce((sum, b) => sum + b);
+    return total / arr.length;
+}
+
+function max(arr) {
+    return arr.reduce((a, b) => Math.max(a, b));
 }
