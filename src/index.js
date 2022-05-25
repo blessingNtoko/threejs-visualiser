@@ -1,5 +1,7 @@
+// Simplex Noise instance
 const noise = new SimplexNoise();
 
+// main function
 const initVisualiser = () => {
     const file = document.getElementById('file');
     const audio = document.getElementById('audio');
@@ -31,6 +33,12 @@ const initVisualiser = () => {
         analyser.fftSize = 512;
         const bufferLength = analyser.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
+
+        // The webgl cometh
+        const scene = new THREE.Scene();
+        const group = new THREE.Group();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 1000);
+        camera.position.set(0, 0, 100);
     }
 
 }
