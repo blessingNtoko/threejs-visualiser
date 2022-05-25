@@ -39,6 +39,13 @@ const initVisualiser = () => {
         const group = new THREE.Group();
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .1, 1000);
         camera.position.set(0, 0, 100);
+        camera.lookAt(scene.position);
+        scene.add(camera);
+
+        const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            antialias: true
+        });
     }
 
 }
