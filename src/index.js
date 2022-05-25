@@ -103,10 +103,56 @@ const initVisualiser = () => {
             const upperHalfArray = dataArray.slice((dataArray.length / 2) -1, dataArray.length - 1);
 
             const overAllAvg = avg(dataArray);
+            const lowerMax = max(lowerHalfArray);
+            const lowerAvg = avg(lowerHalfArray);
+            const upperMax = max(upperHalfArray);
+            const upperAvg = avg(upperHalfArray);
+
+            const lowerMaxFr = lowerMax / lowerHalfArray.length;
+            const lowerAvgFr = lowerAvg / lowerHalfArray.length;
+            const upperMaxFr = upperMax / upperHalfArray.length;
+            const upperAvgFr = upperAvg / upperHalfArray.length;
+
+            makeRoughGround(plane, modulate(upperAvgFr, 0, 1, .5, 4));
+            makeRoughGround(plane2, modulate(lowerMaxFr, 0, 1, .5, 4));
+
+            makeRoughBall(ball, modulate(Math.pow(lowerMaxFr, .8), 0, 1, 0, 8), modulate(upperAvgFr, 0, 1, 0, 4));
+
+            group.rotation.y += .005;
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
         }
-    }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function makeRoughBall(mesh, bassFr, treFr) {
+            mesh.geometry.vertices.forEach((vertex, i) => {
+                const offset = mesh.geometry.parameters.radius;
+                const amp = 7;
+                const time = window.performance.now();
+                vertex.normalize();
+                const rf = .00001;
+                const distance = (offset + baseFr) + noise.noise3D(vertex.x + time * rf * 7, vertex.y + time * rf * 8, vertex.z + time * rf * 9) * amp * treFr;
+                vertex.multiplyScalar(distance);
+            });
+
+            mesh.geometry.verticesNeedUpdate = true;
+            mesh.geometry.normalsNeedUpdate = true;
+            mesh.geometry.computeVertexNormals();
+            mesh.geometry.computeFaceNormals();
+        }
+
+        audio.play();
+    };
 
 }
+
+window.onload = initVisualiser();
+document.body.addEventListener('touchend', (ev) => context.resume());
 
 // Little Helpers
 
